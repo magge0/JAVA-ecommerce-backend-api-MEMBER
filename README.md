@@ -164,7 +164,7 @@ Updating...
 
 ## Contribution Guidelines
 
-We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process for submitting pull requests.
+We welcome contributions! Please see our [CONTRIBUTING.md](./MEMBER.md) for details on the process for submitting pull requests.
 
 ### Getting Started
 
