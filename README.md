@@ -157,10 +157,10 @@ We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for 
 
 ### Getting Started
 
-1. **Clone the Repository**:
+1. **Clone the Repository**: 
    ```bash
-   git clone https://github.com/anonystick/ecommerce-backend.git
-   cd ecommerce-backend
+   git clone https://github.com/anonystick/JAVA-ecommerce-backend-api-MEMBER
+   cd JAVA-ecommerce-backend-api-MEMBER
    ```
 
 2. **Build the Project**:
@@ -174,7 +174,7 @@ We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for 
    ```
 
 4. **Access the API Documentation**:
-   Once the server is running, go to: `http://localhost:8080/swagger-ui/`
+   Once the server is running, go to: `http://localhost:9966/swagger-ui/`
 
 ## License
 
