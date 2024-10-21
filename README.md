@@ -6,6 +6,15 @@ Welcome to the [Java E-commerce Backend open-source - shopdevjava.com](https://w
 
 This backend is developed in Java, utilizing modern frameworks and libraries, and follows best practices in software engineering. We encourage contributions and participation from the open-source community.
 
+## How to Become a Contributor
+If you are interested in contributing to this project, please follow the steps outlined in our contribution guidelines. We encourage all contributors to:
+- Fork the repository. `https://github.com/anonystick/JAVA-ecommerce-backend-api-MEMBER.git`
+- Create a feature branch.
+- Commit your changes.
+- Open a pull request for review.
+
+The best approach is to follow this guide if you are new: [Hướng dẫn Lập Trình Viên tham gia PR vào cộng đồng OpenSource](https://www.youtube.com/watch?v=82oFC6cO5lg)
+
 ## Features
 
 - **User Management**
