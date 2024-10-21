@@ -17,6 +17,8 @@ The best approach is to follow this guide if you are new: [Hướng dẫn Lập 
 
 ## Features
 
+FULL PLAYLIST: [PLAYLIST - Con đường trở thành LẬP TRÌNH VIÊN BACKEND JAVA](https://www.youtube.com/playlist?list=PLw0w5s5b9NK5Trt3AIxCtpRHWR7nI0RyX)
+
 - **User Management**
   - User Registration and Authentication
   - Password Management
