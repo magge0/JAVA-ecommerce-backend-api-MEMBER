@@ -2,7 +2,7 @@
 
 ## Overview
 
-Welcome to the [Java E-commerce Backend open-source - shopdevjava.com](https://www.youtube.com/channel/UCky92hx0lZxVBi2BJ6Zm2Hg/join) project! This project aims to build a backend system for an e-commerce platform similar to Shopee. Our goal is to provide a robust, scalable, and flexible system to handle core e-commerce functionalities such as product management, orders, payments, inventory, etc.
+Welcome to the [Java E-commerce Backend open-source - shopdevjava.com](https://www.youtube.com/channel/UCky92hx0lZxVBi2BJ6Zm2Hg/join) project! This project aims to build a backend system for an e-commerce platform similar to Shopee (Version LITE). Our goal is to provide a robust, scalable, and flexible system to handle core e-commerce functionalities such as product management, orders, payments, inventory, etc.
 
 This backend is developed in Java, utilizing modern frameworks and libraries, and follows best practices in software engineering. We encourage contributions and participation from the open-source community.
 
