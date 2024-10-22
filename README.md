@@ -15,6 +15,24 @@ If you are interested in contributing to this project, please follow the steps o
 
 The best approach is to follow this guide if you are new: [Hướng dẫn Lập Trình Viên tham gia PR vào cộng đồng OpenSource](https://www.youtube.com/watch?v=82oFC6cO5lg)
 
+## Mind maps
+
+### Project Architecture
+
+1. Operating platform
+
+![Project Architecture](./docs/images/0001-vanhanh.png)
+
+2. Shop Management
+![Shop Management](./docs/images/0002-shop-manager.png)
+
+3. User Management
+![User Management](./docs/images/0003-user-manager.png)
+
+4. Product Management
+
+Updating...
+
 ## Features
 
 FULL PLAYLIST: [PLAYLIST - Con đường trở thành LẬP TRÌNH VIÊN BACKEND JAVA](https://www.youtube.com/playlist?list=PLw0w5s5b9NK5Trt3AIxCtpRHWR7nI0RyX)
