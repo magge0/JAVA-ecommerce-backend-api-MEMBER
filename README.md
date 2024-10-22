@@ -99,7 +99,41 @@ ecommerce-backend
 
 ## Project Structure DDD
 
-Updating...
+
+```
+.
+├── MEMBER.md
+├── README.md
+├── mvnw
+├── mvnw.cmd
+├── myshop-framework
+│   └── pom.xml
+├── myshop-module-buyer
+│   ├── pom.xml
+│   └── src
+│       └── main
+│           └── java
+│               └── com
+│                   └── myshop
+│                       └── BuyerApplicationApi.java
+├── myshop-module-manager
+│   ├── pom.xml
+│   └── src
+│       └── main
+│           └── java
+│               └── com
+│                   └── myshop
+│                       └── ManagerApplicationApi.java
+├── myshop-module-store
+│   ├── pom.xml
+│   └── src
+│       └── main
+│           └── java
+│               └── com
+│                   └── myshop
+│                       └── StoreApplicationApi.java
+└── pom.xml
+```
 
 ## Task Checklist
 
