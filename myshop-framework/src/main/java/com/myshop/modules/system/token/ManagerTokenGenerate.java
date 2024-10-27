@@ -46,8 +46,7 @@ public class ManagerTokenGenerate extends TokenGeneratorBase<AdminUser> {
     @Override
     public Token createToken(AdminUser adminUser, Boolean longTerm) {
         // Xây dựng đối tượng AuthUser từ AdminUser
-        AuthUser authUser = AuthUser.builder()
-                .username(adminUser.getUsername()) // Tên đăng nhập
+        AuthUser authUser = AuthUser.builder().username(adminUser.getUsername()) // Tên đăng nhập
                 .id(adminUser.getId()) // ID người dùng
                 .face(adminUser.getAvatar()) // Ảnh đại diện
                 .role(UserEnums.MANAGER) // Vai trò (MANAGER)

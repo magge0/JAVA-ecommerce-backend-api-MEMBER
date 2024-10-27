@@ -31,7 +31,7 @@ The best approach is to follow this guide if you are new: [Hướng dẫn Lập 
 
 4. Product Management
 
-Updating...
+![Product Management](./docs/images/0004-product.png)
 
 ## Features
 
