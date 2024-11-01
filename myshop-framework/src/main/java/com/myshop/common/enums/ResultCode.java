@@ -34,7 +34,41 @@ public enum ResultCode {
      */
     USER_SESSION_EXPIRED(20004, "Phiên đăng nhập của người dùng đã hết hạn, vui lòng đăng nhập lại"),
     USER_PERMISSION_ERROR(20005, "Quyền hạn không đủ"),
-    USER_PASSWORD_ERROR(20010, "Mật khẩu không chính xác");
+    USER_PASSWORD_ERROR(20010, "Mật khẩu không chính xác"),
+
+
+    /**
+     * Sản phẩm
+     */
+    PRODUCT_ERROR(11001, "Sản phẩm lỗi, vui lòng thử lại sau"),
+    PRODUCT_NOT_EXIST(11001, "Sản phẩm đã hết hàng"),
+    PRODUCT_NAME_ERROR(11002, "Tên sản phẩm không chính xác, tên phải từ 2-50 ký tự"),
+    PRODUCT_UNDER_ERROR(11003, "Hết hàng sản phẩm thất bại"),
+    PRODUCT_UPPER_ERROR(11004, "Lên kệ sản phẩm thất bại"),
+    PRODUCT_AUTH_ERROR(11005, "Phê duyệt sản phẩm thất bại"),
+    POINT_PRODUCT_ERROR(11006, "Giao dịch điểm tích lũy sản phẩm bất thường, vui lòng thử lại sau"),
+    POINT_PRODUCT_NOT_EXIST(11020, "Sản phẩm điểm tích lũy không tồn tại"),
+    POINT_PRODUCT_CATEGORY_EXIST(11021, "Danh mục sản phẩm điểm tích lũy hiện tại đã tồn tại"),
+    PRODUCT_SKU_SN_ERROR(11007, "Mã SKU sản phẩm không được để trống"),
+    PRODUCT_SKU_PRICE_ERROR(11008, "Giá sản phẩm SKU không được nhỏ hơn hoặc bằng 0"),
+    PRODUCT_SKU_COST_ERROR(11009, "Giá vốn sản phẩm SKU không được nhỏ hơn hoặc bằng 0"),
+    PRODUCT_SKU_WEIGHT_ERROR(11010, "Trọng lượng sản phẩm không được âm"),
+    PRODUCT_SKU_QUANTITY_ERROR(11011, "Số lượng kho sản phẩm không được âm"),
+    PRODUCT_SKU_QUANTITY_NOT_ENOUGH(11011, "Số lượng kho không đủ"),
+    MUST_HAVE_PRODUCT_SKU(11012, "Phải có ít nhất một thông số kỹ thuật!"),
+    MUST_HAVE_SALES_MODEL(11022, "Chế độ bán hàng là bán sỉ thì phải có quy tắc bán sỉ!"),
+
+    HAVE_INVALID_SALES_MODEL(11023, "Quy tắc bán sỉ có dữ liệu không hợp lệ nhỏ hơn hoặc bằng 0!"),
+    MUST_HAVE_PRODUCT_SKU_VALUE(11024, "Giá trị thông số kỹ thuật không được để trống!"),
+    DO_NOT_MATCH_WHOLESALE(11025, "Số lượng mua sản phẩm bán sỉ không được thấp hơn số lượng khởi điểm!"),
+    PRODUCT_NOT_ERROR(11026, "Sản phẩm không tồn tại"),
+
+    PRODUCT_PARAMS_ERROR(11013, "Thông số kỹ thuật sản phẩm lỗi, vui lòng làm mới và thử lại"),
+    PHYSICAL_PRODUCT_NEED_TEMP(11014, "Sản phẩm thực tế cần chọn mẫu vận chuyển"),
+    VIRTUAL_PRODUCT_NOT_NEED_TEMP(11015, "Sản phẩm ảo không cần chọn mẫu vận chuyển"),
+    PRODUCT_NOT_EXIST_STORE(11017, "Người dùng hiện tại không có quyền thao tác sản phẩm này"),
+    PRODUCT_TYPE_ERROR(11016, "Cần chọn loại sản phẩm"),
+    PRODUCT_STOCK_IMPORT_ERROR(11018, "Nhập kho sản phẩm thất bại, vui lòng kiểm tra dữ liệu trong bảng"),;
 
 
     private final Integer code;
