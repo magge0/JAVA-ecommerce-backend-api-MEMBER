@@ -1,11 +1,13 @@
 package com.myshop.modules.product.serviceimpl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myshop.common.enums.ResultCode;
 import com.myshop.common.exception.ServiceException;
 import com.myshop.modules.product.entity.dos.Product;
 import com.myshop.modules.product.entity.dos.ProductGallery;
+import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
 import com.myshop.modules.product.entity.enums.ProductAuthEnum;
 import com.myshop.modules.product.mapper.ProductMapper;
@@ -56,6 +58,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
         //TODO: tạo chỉ mục sản phẩm ES
     }
+
+    @Override
+    public IPage<Product> queryByParams(ProductSearchParams productSearchParams) {
+        return this.page(PageUtil.initPage(productSearchParams), productSearchParams.queryWrapper());
+    }
+
 
     /**
      * Kiểm tra thông tin sản phẩm
