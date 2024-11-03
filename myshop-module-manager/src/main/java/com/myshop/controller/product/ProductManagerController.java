@@ -15,9 +15,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -47,5 +49,15 @@ public class ProductManagerController {
         throw new ServiceException(ResultCode.PRODUCT_UPPER_ERROR);
     }
 
-
+    @AntiDuplicateSubmission
+    @ApiOperation(value = "Quản trị viên đưa sản phẩm xuống kệ", notes = "Quản trị viên sử dụng chức năng này để đưa sản phẩm xuống kệ")
+    @ApiImplicitParams({@ApiImplicitParam(name = "productId", value = "ID sản phẩm", required = true, paramType = "query", allowMultiple = true), @ApiImplicitParam(name = "reason", value = "Lý do xuống kệ", required = true, paramType = "query")})
+    @PutMapping(value = "/{productId}/under")
+    public ResultMessage<Object> underProduct(@PathVariable String productId, @NotEmpty(message = "Lý do xuống kệ không được để trống") @RequestParam String reason) {
+        List<String> productIds = Arrays.asList(productId.split(","));
+        if (Boolean.TRUE.equals(productService.managerUpdateProductMarketAble(productIds, ProductStatusEnum.DOWN, reason))) {
+            return ResultUtil.success();
+        }
+        throw new ServiceException(ResultCode.PRODUCT_UNDER_ERROR);
+    }
 }

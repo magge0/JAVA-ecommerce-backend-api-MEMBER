@@ -35,4 +35,14 @@ public interface ProductService extends IService<Product> {
      * @return Kết quả cập nhật
      */
     Boolean updateProductMarketAble(List<String> productIds, ProductStatusEnum productStatusEnum, String underReason);
+
+    /**
+     * Cập nhật trạng thái lên kệ của sản phẩm
+     *
+     * @param productIds        Danh sách ID sản phẩm
+     * @param productStatusEnum Trạng thái sản phẩm cần cập nhật
+     * @param underReason       Lý do xuống kệ
+     * @return Kết quả cập nhật
+     */
+    Boolean managerUpdateProductMarketAble(List<String> productIds, ProductStatusEnum productStatusEnum, String underReason);
 }

@@ -105,8 +105,57 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         LambdaQueryWrapper<Product> queryWrapper = this.buildQueryWrapperByStoreAuthority();
         queryWrapper.in(Product::getId, productIds);
         List<Product> productList = this.list(queryWrapper);
-        this.updateGoodsStatus(productIds, productStatusEnum, productList);
+        this.updateProductStatus(productIds, productStatusEnum, productList);
         return operationResult;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    // TODO: sử dụng annotation để ghi log hành động update sản phẩm trong hệ thống.
+    public Boolean managerUpdateProductMarketAble(List<String> productIds, ProductStatusEnum productStatusEnum, String underReason) {
+        boolean operationResult;
+
+        // Nếu danh sách ID sản phẩm rỗng, trả về true
+        if (productIds == null || productIds.isEmpty()) {
+            return true;
+        }
+
+        // Kiểm tra quyền quản trị viên
+        this.verifyManagerAccess();
+
+        // Tạo đối tượng LambdaUpdateWrapper để cập nhật dữ liệu
+        LambdaUpdateWrapper<Product> updateWrapper = new LambdaUpdateWrapper<>();
+        // Cập nhật trường MarketEnable (trạng thái lên/xuống kệ)
+        updateWrapper.set(Product::getDisplayStatus, productStatusEnum.name());
+        // Cập nhật trường UnderMessage (lý do xuống kệ)
+        updateWrapper.set(Product::getHiddenReason, underReason);
+        // Lọc sản phẩm theo danh sách ID
+        updateWrapper.in(Product::getId, productIds);
+        // Thực hiện cập nhật dữ liệu
+        operationResult = this.update(updateWrapper);
+
+        // Cập nhật trạng thái của các sản phẩm thuộc loại SKU
+        LambdaQueryWrapper<Product> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.in(Product::getId, productIds); // Lọc sản phẩm theo danh sách ID
+        List<Product> productList = this.list(queryWrapper); // Lấy danh sách sản phẩm
+        this.updateProductStatus(productIds, productStatusEnum, productList); // Cập nhật trạng thái của các sản phẩm thuộc loại SKU
+
+        return operationResult;
+    }
+
+    /**
+     * Kiểm tra quyền quản trị viên của cửa hàng hiện tại đang đăng nhập
+     *
+     * @return Thông tin người dùng đang đăng nhập
+     */
+    private AuthUser verifyManagerAccess() {
+        AuthUser currentAuthUser = UserContext.getCurrentUser();
+        // Nếu người dùng hiện tại không rỗng và có vai trò quản trị viên
+        if (currentAuthUser != null && (currentAuthUser.getRole().equals(UserEnums.MANAGER))) {
+            return currentAuthUser;
+        } else {
+            throw new ServiceException(ResultCode.USER_AUTH_ERROR);
+        }
     }
 
     /**
@@ -116,7 +165,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      * @param productStatusEnum Trạng thái sản phẩm
      * @param productList       Danh sách sản phẩm
      */
-    private void updateGoodsStatus(List<String> productIds, ProductStatusEnum productStatusEnum, List<Product> productList) {
+    private void updateProductStatus(List<String> productIds, ProductStatusEnum productStatusEnum, List<Product> productList) {
         List<String> productCacheKeys = new ArrayList<>();
         for (Product product : productList) {
             productCacheKeys.add(CachePrefix.PRODUCT.getPrefix() + product.getId());
