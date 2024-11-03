@@ -16,29 +16,29 @@ public class PageVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "Số trang")
-    private Integer pageNumber = 1;
+    private Integer currentPage = 1;
 
     @ApiModelProperty(value = "Số lượng mỗi trang")
-    private Integer pageSize = 10;
+    private Integer pageLimit = 10;
 
     @ApiModelProperty(value = "Trường sắp xếp")
-    private String sort;
+    private String sortBy;
 
     @ApiModelProperty(value = "Cách sắp xếp asc/desc")
-    private String order;
+    private String sortOrder;
 
     @ApiModelProperty(value = "Cần chuyển đổi camel sang snake", notes = "Thường không xử lý, nếu cơ sở dữ liệu là snake, thì phần này cần được xử lý.")
     private Boolean convertCamelToSnake;
 
     public String getSortField() {
-        if (CharSequenceUtil.isNotEmpty(sort)) {
+        if (CharSequenceUtil.isNotEmpty(sortBy)) {
             if (convertCamelToSnake == null || Boolean.FALSE.equals(convertCamelToSnake)) {
-                return StringUtils.camel2Underline(sort);
+                return StringUtils.camel2Underline(sortBy);
             } else {
-                return sort;
+                return sortBy;
             }
         }
-        return sort;
+        return sortBy;
     }
 
 }

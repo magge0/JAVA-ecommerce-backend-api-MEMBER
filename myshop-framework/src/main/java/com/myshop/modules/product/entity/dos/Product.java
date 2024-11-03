@@ -41,7 +41,7 @@ public class Product extends BaseEntity {
     @ApiModelProperty(value = "Giá sản phẩm", required = true)
     @NotNull(message = "Giá sản phẩm không được để trống")
     @Min(value = 0, message = "Giá sản phẩm không được là số âm")
-//    @Max(value = 99999999, message = "Giá sản phẩm không được vượt quá 99999999")
+    @Max(value = 999999999, message = "Giá sản phẩm không được vượt quá 99999999")
     private Double price;
 
     @ApiModelProperty(value = "ID thương hiệu")
@@ -70,7 +70,7 @@ public class Product extends BaseEntity {
     @ApiModelProperty(value = "Số lượng mua")
     private Integer buyCount;
 
-    @Max(value = 99999999, message = "Số lượng tồn kho không được vượt quá 99999999")
+    @Max(value = 999999999, message = "Số lượng tồn kho không được vượt quá 99999999")
     @ApiModelProperty(value = "Số lượng tồn kho")
     private Integer quantity;
 

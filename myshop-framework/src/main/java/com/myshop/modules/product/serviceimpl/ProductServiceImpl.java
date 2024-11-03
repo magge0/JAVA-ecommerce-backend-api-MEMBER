@@ -1,25 +1,38 @@
 package com.myshop.modules.product.serviceimpl;
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.myshop.cache.Cache;
+import com.myshop.cache.CachePrefix;
 import com.myshop.common.enums.ResultCode;
 import com.myshop.common.exception.ServiceException;
+import com.myshop.common.security.AuthUser;
+import com.myshop.common.security.context.UserContext;
+import com.myshop.common.security.enums.UserEnums;
 import com.myshop.modules.product.entity.dos.Product;
 import com.myshop.modules.product.entity.dos.ProductGallery;
 import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
 import com.myshop.modules.product.entity.enums.ProductAuthEnum;
+import com.myshop.modules.product.entity.enums.ProductStatusEnum;
 import com.myshop.modules.product.mapper.ProductMapper;
 import com.myshop.modules.product.service.ProductGalleryService;
 import com.myshop.modules.product.service.ProductService;
+import com.myshop.modules.product.service.ProductSkuService;
 import com.myshop.modules.system.entity.dos.Setting;
 import com.myshop.modules.system.entity.dto.ProductSetting;
 import com.myshop.modules.system.entity.enums.SettingEnum;
 import com.myshop.modules.system.service.SettingService;
+import com.myshop.orm.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> implements ProductService {
@@ -29,6 +42,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Autowired
     private ProductGalleryService productGalleryService;
+
+    @Autowired
+    private Cache<Product> cache;
+
+    @Autowired
+    private ProductSkuService productSkuService;
 
 
     @Override
@@ -61,7 +80,102 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
     @Override
     public IPage<Product> queryByParams(ProductSearchParams productSearchParams) {
-        return this.page(PageUtil.initPage(productSearchParams), productSearchParams.queryWrapper());
+        return this.page(PageUtil.buildPage(productSearchParams), productSearchParams.queryWrapper());
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    // TODO: sử dụng annotation để ghi log hành động update sản phẩm trong hệ thống.
+    public Boolean updateProductMarketAble(List<String> productIds, ProductStatusEnum productStatusEnum, String underReason) {
+        boolean operationResult;
+
+        //Nếu sản phẩm rỗng, trả về trực tiếp
+        if (productIds == null || productIds.isEmpty()) {
+            return true;
+        }
+
+        LambdaUpdateWrapper<Product> updateWrapper = this.buildUpdateWrapperForStoreAuthority();
+        updateWrapper.set(Product::getDisplayStatus, productStatusEnum.name());
+        updateWrapper.set(Product::getHiddenReason, underReason);
+        updateWrapper.in(Product::getId, productIds);
+        operationResult = this.update(updateWrapper);
+
+        //Sửa đổi sản phẩm quy cách
+        LambdaQueryWrapper<Product> queryWrapper = this.buildQueryWrapperByStoreAuthority();
+        queryWrapper.in(Product::getId, productIds);
+        List<Product> productList = this.list(queryWrapper);
+        this.updateGoodsStatus(productIds, productStatusEnum, productList);
+        return operationResult;
+    }
+
+    /**
+     * Cập nhật trạng thái sản phẩm
+     *
+     * @param productIds        ID sản phẩm
+     * @param productStatusEnum Trạng thái sản phẩm
+     * @param productList       Danh sách sản phẩm
+     */
+    private void updateGoodsStatus(List<String> productIds, ProductStatusEnum productStatusEnum, List<Product> productList) {
+        List<String> productCacheKeys = new ArrayList<>();
+        for (Product product : productList) {
+            productCacheKeys.add(CachePrefix.PRODUCT.getPrefix() + product.getId());
+            productSkuService.updateProductSkuStatus(product);
+        }
+        cache.batchDelete(productCacheKeys);
+
+        if (ProductStatusEnum.DOWN.equals(productStatusEnum)) {
+            //  TODO: xoá san pham tren ES theo productIds
+        } else {
+            // TODO: update san pham tren ES the productIds
+        }
+
+        //Gửi tin nhắn xuống kệ sản phẩm
+        if (productStatusEnum.equals(ProductStatusEnum.DOWN)) {
+            //TODO: trien khai MQ
+        }
+    }
+
+    /**
+     * Lấy QueryWrapper (Kiểm tra quyền hạn của người dùng)
+     *
+     * @return queryWrapper
+     */
+    private LambdaQueryWrapper<Product> buildQueryWrapperByStoreAuthority() {
+        LambdaQueryWrapper<Product> queryWrapper = new LambdaQueryWrapper<>();
+        AuthUser authUser = this.getCurrentStoreUser();
+        if (authUser != null) {
+            queryWrapper.eq(Product::getStoreId, authUser.getStoreId());
+        }
+        return queryWrapper;
+    }
+
+    /**
+     * Lấy UpdateWrapper (Kiểm tra quyền hạn của người dùng)
+     *
+     * @return updateWrapper
+     */
+    private LambdaUpdateWrapper<Product> buildUpdateWrapperForStoreAuthority() {
+        LambdaUpdateWrapper<Product> updateWrapper = new LambdaUpdateWrapper<>();
+        AuthUser authUser = this.getCurrentStoreUser();
+        if (authUser != null) {
+            updateWrapper.eq(Product::getStoreId, authUser.getStoreId());
+        }
+        return updateWrapper;
+    }
+
+    /**
+     * Kiểm tra cửa hàng hiện tại đang đăng nhập
+     *
+     * @return Cửa hàng hiện tại đang đăng nhập
+     */
+    private AuthUser getCurrentStoreUser() {
+        AuthUser currentAuthUser = UserContext.getCurrentUser();
+        //Nếu thành viên hiện tại không rỗng và là vai trò cửa hàng
+        if (currentAuthUser != null && (currentAuthUser.getRole().equals(UserEnums.STORE) && currentAuthUser.getStoreId() != null)) {
+            return currentAuthUser;
+        }
+        return null;
     }
 
 

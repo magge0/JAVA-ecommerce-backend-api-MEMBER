@@ -1,5 +1,7 @@
 package com.myshop.cache;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -60,4 +62,20 @@ public interface Cache<T> {
      */
     Boolean remove(Object key);
 
+    /**
+     * Bộ đếm redis tăng thêm
+     * Lưu ý: Sau khi đạt đến liveTime, lần tăng thêm này sẽ bị hủy bỏ, tức là tự động -1, thay vì giá trị redis rỗng
+     *
+     * @param key      Là key cộng dồn, cùng một key mỗi lần gọi thì giá trị +1
+     * @param liveTime Đơn vị giây sau khi hết hạn
+     * @return Kết quả bộ đếm
+     */
+    Long increment(String key, long liveTime);
+
+    /**
+     * Xóa hàng loạt
+     *
+     * @param keys Tập hợp các khóa cần xóa
+     */
+    void batchDelete(Collection keys);
 }

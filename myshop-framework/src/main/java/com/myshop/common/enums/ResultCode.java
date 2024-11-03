@@ -68,7 +68,12 @@ public enum ResultCode {
     VIRTUAL_PRODUCT_NOT_NEED_TEMP(11015, "Sản phẩm ảo không cần chọn mẫu vận chuyển"),
     PRODUCT_NOT_EXIST_STORE(11017, "Người dùng hiện tại không có quyền thao tác sản phẩm này"),
     PRODUCT_TYPE_ERROR(11016, "Cần chọn loại sản phẩm"),
-    PRODUCT_STOCK_IMPORT_ERROR(11018, "Nhập kho sản phẩm thất bại, vui lòng kiểm tra dữ liệu trong bảng"),;
+    PRODUCT_STOCK_IMPORT_ERROR(11018, "Nhập kho sản phẩm thất bại, vui lòng kiểm tra dữ liệu trong bảng"),
+
+    /**
+     * Ngoại lệ hệ thống
+     */
+    RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau");
 
 
     private final Integer code;
