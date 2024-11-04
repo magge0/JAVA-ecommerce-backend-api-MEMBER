@@ -1,5 +1,6 @@
 package com.myshop.modules.product.serviceimpl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -12,13 +13,18 @@ import com.myshop.common.exception.ServiceException;
 import com.myshop.common.security.AuthUser;
 import com.myshop.common.security.context.UserContext;
 import com.myshop.common.security.enums.UserEnums;
+import com.myshop.modules.product.entity.dos.Category;
 import com.myshop.modules.product.entity.dos.Product;
 import com.myshop.modules.product.entity.dos.ProductGallery;
 import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
+import com.myshop.modules.product.entity.dto.ProductParamsDTO;
 import com.myshop.modules.product.entity.enums.ProductAuthEnum;
 import com.myshop.modules.product.entity.enums.ProductStatusEnum;
+import com.myshop.modules.product.entity.vos.ProductSkuVO;
+import com.myshop.modules.product.entity.vos.ProductVO;
 import com.myshop.modules.product.mapper.ProductMapper;
+import com.myshop.modules.product.service.CategoryService;
 import com.myshop.modules.product.service.ProductGalleryService;
 import com.myshop.modules.product.service.ProductService;
 import com.myshop.modules.product.service.ProductSkuService;
@@ -27,11 +33,13 @@ import com.myshop.modules.system.entity.dto.ProductSetting;
 import com.myshop.modules.system.entity.enums.SettingEnum;
 import com.myshop.modules.system.service.SettingService;
 import com.myshop.orm.util.PageUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -44,7 +52,10 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     private ProductGalleryService productGalleryService;
 
     @Autowired
-    private Cache<Product> cache;
+    private CategoryService categoryService;
+
+    @Autowired
+    private Cache<ProductVO> cache;
 
     @Autowired
     private ProductSkuService productSkuService;
@@ -79,7 +90,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     @Override
-    public IPage<Product> queryByParams(ProductSearchParams productSearchParams) {
+    public IPage<Product> getByParams(ProductSearchParams productSearchParams) {
         return this.page(PageUtil.buildPage(productSearchParams), productSearchParams.queryWrapper());
     }
 
@@ -141,6 +152,63 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         this.updateProductStatus(productIds, productStatusEnum, productList); // Cập nhật trạng thái của các sản phẩm thuộc loại SKU
 
         return operationResult;
+    }
+
+
+    @Override
+    public ProductVO getProductVO(String productId) {
+        // Lấy từ bộ nhớ cache, nếu không có thì đọc từ cache
+        ProductVO productVO = cache.get(CachePrefix.PRODUCT.getPrefix() + productId);
+        if (productVO != null) {
+            return productVO;
+        }
+
+        // Tìm kiếm thông tin sản phẩm
+        Product product = this.getById(productId);
+        if (product == null) {
+            log.error("Sản phẩm có ID là " + productId + " không tồn tại");
+            throw new ServiceException(ResultCode.PRODUCT_NOT_EXIST);
+        }
+
+        productVO = new ProductVO();
+        // Gán giá trị
+        BeanUtils.copyProperties(product, productVO);
+        // ID sản phẩm
+        productVO.setId(product.getId());
+        // Gán giá trị cho album sản phẩm
+        List<String> images = new ArrayList<>();
+        List<ProductGallery> galleryList = productGalleryService.productGalleryList(productId);
+        for (ProductGallery productGallery : galleryList) {
+            images.add(productGallery.getOriginal());
+        }
+        productVO.setProductGalleryList(images);
+
+        // Gán giá trị cho SKU sản phẩm
+        List<ProductSkuVO> productListByProductId = productSkuService.getProductListByProductId(productId);
+        if (productListByProductId != null && !productListByProductId.isEmpty()) {
+            productVO.setSkuList(productListByProductId);
+        }
+
+        // Gán giá trị cho tên danh mục sản phẩm
+        List<String> categoryName = new ArrayList<>();
+        String categoryPath = product.getCategoryPath();
+        String[] strArray = categoryPath.split(",");
+        List<Category> categories = categoryService.listByIds(Arrays.asList(strArray));
+        for (Category category : categories) {
+            categoryName.add(category.getName());
+        }
+        productVO.setCategoryName(categoryName);
+
+        // Điền thông số nếu không rỗng
+        if (CharSequenceUtil.isNotEmpty(product.getParams())) {
+            productVO.setProductParamsDTOList(JSONUtil.toList(product.getParams(), ProductParamsDTO.class));
+        }
+
+        //TODO: set whosale list
+
+
+        cache.put(CachePrefix.PRODUCT.getPrefix() + productId, productVO);
+        return productVO;
     }
 
     /**

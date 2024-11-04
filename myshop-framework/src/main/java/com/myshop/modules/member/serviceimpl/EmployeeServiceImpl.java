@@ -1,4 +1,4 @@
-package com.myshop.modules.member.impl;
+package com.myshop.modules.member.serviceimpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

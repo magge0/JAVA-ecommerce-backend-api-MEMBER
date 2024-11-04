@@ -18,8 +18,16 @@ public interface ProductGalleryService extends IService<ProductGallery> {
     /**
      * Thêm album ảnh sản phẩm
      *
-     * @param goodsGalleryList Danh sách album ảnh sản phẩm
+     * @param productGalleryList Danh sách album ảnh sản phẩm
      * @param goodsId          ID sản phẩm
      */
-    void add(List<String> goodsGalleryList, String goodsId);
+    void add(List<String> productGalleryList, String goodsId);
+
+    /**
+     * Tìm kiếm album ảnh sản phẩm theo ID sản phẩm
+     *
+     * @param productId ID sản phẩm
+     * @return Danh sách album ảnh sản phẩm
+     */
+    List<ProductGallery> productGalleryList(String productId);
 }

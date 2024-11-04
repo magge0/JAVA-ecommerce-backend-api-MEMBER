@@ -42,6 +42,11 @@ public class ProductGalleryServiceImpl extends ServiceImpl<ProductGalleryMapper,
     }
 
     @Override
+    public List<ProductGallery> productGalleryList(String productId) {
+        return this.baseMapper.selectList(new QueryWrapper<ProductGallery>().eq("productId", productId));
+    }
+
+    @Override
     public ProductGallery getProductGallery(String origin) {
         ProductGallery goodsGallery = new ProductGallery();
         // Lấy cấu hình hệ thống sản phẩm để quyết định có cần phê duyệt hay không

@@ -6,6 +6,7 @@ import com.myshop.modules.product.entity.dos.Product;
 import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
 import com.myshop.modules.product.entity.enums.ProductStatusEnum;
+import com.myshop.modules.product.entity.vos.ProductVO;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface ProductService extends IService<Product> {
      * @param productSearchParams Tham số truy vấn
      * @return Phân trang sản phẩm
      */
-    IPage<Product> queryByParams(ProductSearchParams productSearchParams);
+    IPage<Product> getByParams(ProductSearchParams productSearchParams);
 
     /**
      * Cập nhật trạng thái đưa sản phẩm lên kệ
@@ -45,4 +46,12 @@ public interface ProductService extends IService<Product> {
      * @return Kết quả cập nhật
      */
     Boolean managerUpdateProductMarketAble(List<String> productIds, ProductStatusEnum productStatusEnum, String underReason);
+
+    /**
+     * Tìm kiếm sản phẩm VO
+     *
+     * @param productId ID sản phẩm
+     * @return VO sản phẩm
+     */
+    ProductVO getProductVO(String productId);
 }
