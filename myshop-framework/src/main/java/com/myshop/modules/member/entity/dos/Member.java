@@ -2,7 +2,7 @@ package com.myshop.modules.member.entity.dos;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.myshop.common.enums.ClientTypeEnum;
+import com.myshop.common.enums.ClientType;
 import com.myshop.common.security.sensitive.SensitiveData;
 import com.myshop.common.security.sensitive.enums.SensitiveStrategy;
 import com.myshop.common.utils.CommonUtil;
@@ -78,7 +78,7 @@ public class Member extends BaseEntity {
     private String storeId;
 
     /**
-     * @see ClientTypeEnum
+     * @see ClientType
      */
     @ApiModelProperty(value = "Client")
     private String clientType;

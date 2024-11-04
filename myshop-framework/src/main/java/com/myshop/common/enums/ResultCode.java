@@ -38,6 +38,7 @@ public enum ResultCode {
     USER_AUTH_ERROR(20005, "Quyền hạn không đủ"),
     EMPLOYEE_NOT_FOUND(20027, "Nhân viên không tồn tại"),
     EMPLOYEE_DISABLED(20031, "Nhân viên đã bị vô hiệu hóa"),
+    USER_NOT_FOUND(20002, "Người dùng không tồn tại hoặc tài khoản đã bị vô hiệu hóa"),
 
 
     /**

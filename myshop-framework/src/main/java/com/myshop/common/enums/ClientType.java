@@ -4,7 +4,7 @@ package com.myshop.common.enums;
  * Client Type Enum
  */
 
-public enum ClientTypeEnum {
+public enum ClientType {
     /**
      * "Máy tính cá nhân"
      */
@@ -24,7 +24,7 @@ public enum ClientTypeEnum {
 
     private String clientName;
 
-    ClientTypeEnum(String description) {
+    ClientType(String description) {
         this.clientName = description;
     }
 
