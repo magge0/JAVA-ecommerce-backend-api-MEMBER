@@ -40,12 +40,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * StoreAuthenticationFilter
+ * AuthenticationFilterForStore
  *
  * @author vantrang
  */
 @Slf4j
-public class StoreAuthenticationFilter extends BasicAuthenticationFilter {
+public class AuthenticationFilterForStore extends BasicAuthenticationFilter {
 
     private final Cache cache;
 
@@ -55,7 +55,7 @@ public class StoreAuthenticationFilter extends BasicAuthenticationFilter {
 
     private final EmployeeService employeeService;
 
-    public StoreAuthenticationFilter(AuthenticationManager authenticationManager, StoreTokenProvider storeTokenProvider, StoreRoleMenuService storeRoleMenuService, EmployeeService employeeService, Cache cache) {
+    public AuthenticationFilterForStore(AuthenticationManager authenticationManager, StoreTokenProvider storeTokenProvider, StoreRoleMenuService storeRoleMenuService, EmployeeService employeeService, Cache cache) {
         super(authenticationManager);
         this.storeTokenProvider = storeTokenProvider;
         this.storeRoleMenuService = storeRoleMenuService;
@@ -67,14 +67,14 @@ public class StoreAuthenticationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         //Get jwt from header
-        String jwt = request.getHeader(SecurityEnum.HEADER_TOKEN.getValue());
+        String authorizationToken = request.getHeader(SecurityEnum.AUTHORIZATION_HEADER.getValue());
         //If there is no token, return
-        if (StrUtil.isBlank(jwt)) {
+        if (StrUtil.isBlank(authorizationToken)) {
             chain.doFilter(request, response);
             return;
         }
         //Get user information and store it in context
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(jwt, response);
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(authorizationToken, response);
         //Custom permission filtering
         if (authentication != null) {
             customAuthentication(request, response, authentication);
@@ -96,17 +96,17 @@ public class StoreAuthenticationFilter extends BasicAuthenticationFilter {
         try {
             Claims claims = Jwts.parser().setSigningKey(SecretKeyUtil.generalKeyByDecoders()).parseClaimsJws(jwt).getBody();
             //Get user information stored in claims
-            String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
-            AuthUser authUser = new Gson().fromJson(json, AuthUser.class);
+            String userContextJson = claims.get(SecurityEnum.USER_CONTEXT_KEY.getValue()).toString();
+            AuthUser user = new Gson().fromJson(userContextJson, AuthUser.class);
 
             //Verify whether there are permissions in redis
-            if (cache.hasKey(CachePrefix.ACCESS_TOKEN.getPrefix(UserEnums.STORE, authUser.getId()) + jwt)) {
+            if (cache.hasKey(CachePrefix.ACCESS_TOKEN.getPrefix(UserEnums.STORE, user.getId()) + jwt)) {
                 //user role
-                List<GrantedAuthority> auths = new ArrayList<>();
-                auths.add(new SimpleGrantedAuthority("ROLE_" + authUser.getRole().name()));
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
                 //Construct return information
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser.getUsername(), null, auths);
-                authentication.setDetails(authUser);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+                authentication.setDetails(user);
                 return authentication;
             }
             ResponseUtil.output(response, HttpServletResponse.SC_FORBIDDEN, ResponseUtil.resultMap(false, HttpServletResponse.SC_FORBIDDEN, "Login has expired, please log in again!"));

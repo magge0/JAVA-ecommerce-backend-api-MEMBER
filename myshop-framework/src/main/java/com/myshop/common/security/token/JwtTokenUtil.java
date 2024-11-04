@@ -72,7 +72,7 @@ public class JwtTokenUtil {
         }
 
         // Lấy thông tin người dùng được lưu trữ trong claims
-        String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
+        String json = claims.get(SecurityEnum.USER_CONTEXT_KEY.getValue()).toString();
         AuthUser user = new Gson().fromJson(json, AuthUser.class);
         UserEnums userEnums = user.getRole();
 
@@ -120,7 +120,7 @@ public class JwtTokenUtil {
         // Tạo JWT
         return Jwts.builder()
                 // Khai báo riêng tư JWT
-                .claim(SecurityEnum.USER_CONTEXT.getValue(), new Gson().toJson(user))
+                .claim(SecurityEnum.USER_CONTEXT_KEY.getValue(), new Gson().toJson(user))
                 // Chủ thể JWT
                 .setSubject(user.getUsername())
                 // Thời gian hết hạn: hiện tại + thời gian hết hạn (phút)

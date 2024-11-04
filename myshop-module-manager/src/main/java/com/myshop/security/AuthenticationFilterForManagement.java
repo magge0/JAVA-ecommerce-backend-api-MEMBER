@@ -2,17 +2,17 @@ package com.myshop.security;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.google.gson.Gson;
 import com.myshop.cache.Cache;
 import com.myshop.cache.CachePrefix;
 import com.myshop.common.security.AuthUser;
+import com.myshop.common.security.enums.PermissionEnum;
 import com.myshop.common.security.enums.SecurityEnum;
 import com.myshop.common.security.enums.UserEnums;
 import com.myshop.common.security.token.SecretKeyUtil;
 import com.myshop.common.utils.ResponseUtil;
 import com.myshop.modules.permission.service.MenuService;
-import com.myshop.common.security.enums.PermissionEnum;
 import com.myshop.modules.system.token.ManagerTokenProvider;
-import com.google.gson.Gson;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -39,7 +39,7 @@ import java.util.Map;
  * Management-side token filtering
  */
 @Slf4j
-public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
+public class AuthenticationFilterForManagement extends BasicAuthenticationFilter {
 
     private final Cache cache;
 
@@ -47,7 +47,7 @@ public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
 
     private final ManagerTokenProvider managerTokenProvider;
 
-    public ManagementAuthenticationFilter(AuthenticationManager authenticationManager, MenuService menuService, ManagerTokenProvider managerTokenProvider, Cache cache) {
+    public AuthenticationFilterForManagement(AuthenticationManager authenticationManager, MenuService menuService, ManagerTokenProvider managerTokenProvider, Cache cache) {
         super(authenticationManager);
         this.cache = cache;
         this.menuService = menuService;
@@ -59,15 +59,15 @@ public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) {
 
         //Get jwt from header
-        String jwt = request.getHeader(SecurityEnum.HEADER_TOKEN.getValue());
+        String authorizationToken = request.getHeader(SecurityEnum.AUTHORIZATION_HEADER.getValue());
         //If there is no token, return
-        if (StrUtil.isBlank(jwt)) {
+        if (StrUtil.isBlank(authorizationToken)) {
             chain.doFilter(request, response);
             return;
         }
 
         //Get user information and store it in context
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(jwt, response);
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(authorizationToken, response);
         //Custom permission filtering
         if (authentication != null) {
             customAuthentication(request, response, authentication);
@@ -86,17 +86,17 @@ public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
      * @throws NoPermissionException
      */
     private void customAuthentication(HttpServletRequest request, HttpServletResponse response, UsernamePasswordAuthenticationToken authentication) throws NoPermissionException {
-        AuthUser authUser = (AuthUser) authentication.getDetails();
+        AuthUser user = (AuthUser) authentication.getDetails();
         String requestUrl = request.getRequestURI();
 
 
         //If you are not a super administrator, authenticate
-        if (Boolean.FALSE.equals(authUser.getIsSuper())) {
-            String permissionCacheKey = CachePrefix.PERMISSION_LIST.getPrefix(UserEnums.MANAGER) + authUser.getId();
+        if (Boolean.FALSE.equals(user.getIsSuper())) {
+            String permissionCacheKey = CachePrefix.PERMISSION_LIST.getPrefix(UserEnums.MANAGER) + user.getId();
             //Get permissions from cache
             Map<String, List<String>> permission = (Map<String, List<String>>) cache.get(permissionCacheKey);
             if (permission == null || permission.isEmpty()) {
-                permission = managerTokenProvider.permissionList(this.menuService.findAllMenu(authUser.getId()));
+                permission = managerTokenProvider.permissionList(this.menuService.findAllMenu(user.getId()));
                 cache.put(permissionCacheKey, permission);
             }
             //Get data (GET request) permission
@@ -150,16 +150,16 @@ public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
         try {
             Claims claims = Jwts.parser().setSigningKey(SecretKeyUtil.generalKeyByDecoders()).parseClaimsJws(jwt).getBody();
             //Get user information stored in claims
-            String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
-            AuthUser authUser = new Gson().fromJson(json, AuthUser.class);
+            String userContextJson = claims.get(SecurityEnum.USER_CONTEXT_KEY.getValue()).toString();
+            AuthUser authUser = new Gson().fromJson(userContextJson, AuthUser.class);
 
             //Xác minh xem có quyền trong redis không
             if (cache.hasKey(CachePrefix.ACCESS_TOKEN.getPrefix(UserEnums.MANAGER, authUser.getId()) + jwt)) {
                 //vai trò người dùng
-                List<GrantedAuthority> auths = new ArrayList<>();
-                auths.add(new SimpleGrantedAuthority("ROLE_" + authUser.getRole().name()));
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + authUser.getRole().name()));
                 //Xây dựng thông tin trả về
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser.getUsername(), null, auths);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(authUser.getUsername(), null, authorities);
                 authentication.setDetails(authUser);
                 return authentication;
             }
