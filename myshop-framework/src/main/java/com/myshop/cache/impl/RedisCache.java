@@ -4,8 +4,10 @@ import com.myshop.cache.Cache;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.support.atomic.RedisAtomicLong;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -54,5 +56,21 @@ public class RedisCache implements Cache {
     @Override
     public Boolean remove(Object key) {
         return redisTemplate.delete(key);
+    }
+
+    @Override
+    public Long increment(String key, long liveTime) {
+        RedisAtomicLong atomicCounter = new RedisAtomicLong(key, redisTemplate.getConnectionFactory());
+        Long counterValue = atomicCounter.getAndIncrement();
+        //Thiết lập thời gian hết hạn ban đầu
+        if (counterValue == 0 && liveTime > 0) {
+            atomicCounter.expire(liveTime, TimeUnit.SECONDS);
+        }
+        return counterValue;
+    }
+
+    @Override
+    public void batchDelete(Collection keys) {
+        redisTemplate.delete(keys);
     }
 }

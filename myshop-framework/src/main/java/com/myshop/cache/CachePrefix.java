@@ -20,7 +20,17 @@ public enum CachePrefix {
     /**
      * refresh token
      */
-    REFRESH_TOKEN;
+    REFRESH_TOKEN,
+
+    /**
+     * San pham
+     */
+    PRODUCT,
+
+    /**
+     * Product sku
+     */
+    PRODUCT_SKU;
 
 
     public static String removePrefix(String string) {
@@ -51,7 +61,7 @@ public enum CachePrefix {
      * Lấy giá trị khóa cache + phía người dùng + tiền tố tùy chỉnh
      * Ví dụ: Ba nền tảng đều có hệ thống người dùng, cần đăng nhập riêng biệt, nếu tên người dùng trùng nhau, quyền hạn trong Redis có thể xảy ra xung đột.
      *
-     * @param userEnum         Vai trò
+     * @param userEnum     Vai trò
      * @param customPrefix Tiền tố tùy chỉnh
      * @return Giá trị khóa cache
      */

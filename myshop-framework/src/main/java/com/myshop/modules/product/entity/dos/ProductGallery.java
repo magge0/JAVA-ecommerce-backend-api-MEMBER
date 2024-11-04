@@ -14,7 +14,7 @@ import org.springframework.data.annotation.CreatedBy;
  * Album ảnh sản phẩm
  */
 @Data
-@TableName("myshop_goods_gallery")
+@TableName("myshop_product_gallery")
 @ApiModel(value = "Album ảnh sản phẩm")
 public class ProductGallery extends IdBasedEntity {
 

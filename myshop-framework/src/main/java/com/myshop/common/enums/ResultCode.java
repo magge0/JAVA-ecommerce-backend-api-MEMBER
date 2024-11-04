@@ -35,6 +35,7 @@ public enum ResultCode {
     USER_SESSION_EXPIRED(20004, "Phiên đăng nhập của người dùng đã hết hạn, vui lòng đăng nhập lại"),
     USER_PERMISSION_ERROR(20005, "Quyền hạn không đủ"),
     USER_PASSWORD_ERROR(20010, "Mật khẩu không chính xác"),
+    USER_AUTH_ERROR(20005, "Quyền hạn không đủ"),
 
 
     /**
@@ -43,7 +44,7 @@ public enum ResultCode {
     PRODUCT_ERROR(11001, "Sản phẩm lỗi, vui lòng thử lại sau"),
     PRODUCT_NOT_EXIST(11001, "Sản phẩm đã hết hàng"),
     PRODUCT_NAME_ERROR(11002, "Tên sản phẩm không chính xác, tên phải từ 2-50 ký tự"),
-    PRODUCT_UNDER_ERROR(11003, "Hết hàng sản phẩm thất bại"),
+    PRODUCT_UNDER_ERROR(11003, "Xuống kệ sản phẩm thất bại"),
     PRODUCT_UPPER_ERROR(11004, "Lên kệ sản phẩm thất bại"),
     PRODUCT_AUTH_ERROR(11005, "Phê duyệt sản phẩm thất bại"),
     POINT_PRODUCT_ERROR(11006, "Giao dịch điểm tích lũy sản phẩm bất thường, vui lòng thử lại sau"),
@@ -68,7 +69,12 @@ public enum ResultCode {
     VIRTUAL_PRODUCT_NOT_NEED_TEMP(11015, "Sản phẩm ảo không cần chọn mẫu vận chuyển"),
     PRODUCT_NOT_EXIST_STORE(11017, "Người dùng hiện tại không có quyền thao tác sản phẩm này"),
     PRODUCT_TYPE_ERROR(11016, "Cần chọn loại sản phẩm"),
-    PRODUCT_STOCK_IMPORT_ERROR(11018, "Nhập kho sản phẩm thất bại, vui lòng kiểm tra dữ liệu trong bảng"),;
+    PRODUCT_STOCK_IMPORT_ERROR(11018, "Nhập kho sản phẩm thất bại, vui lòng kiểm tra dữ liệu trong bảng"),
+
+    /**
+     * Ngoại lệ hệ thống
+     */
+    RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau");
 
 
     private final Integer code;
@@ -87,4 +93,4 @@ public enum ResultCode {
     public String message() {
         return this.message;
     }
-}
+    }

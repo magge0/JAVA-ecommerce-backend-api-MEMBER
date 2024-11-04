@@ -24,12 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductStoreController {
 
     @Autowired
-    private ProductService goodsService;
+    private ProductService productService;
 
     @ApiOperation(value = "Thêm sản phẩm mới")
     @PostMapping(value = "/add", consumes = "application/json", produces = "application/json")
     public ResultMessage<ProductOperationDTO> save(@Valid @RequestBody ProductOperationDTO productOperationDTO) {
-        goodsService.addProduct(productOperationDTO);
+        productService.addProduct(productOperationDTO);
         return ResultUtil.success();
     }
 }
