@@ -6,8 +6,8 @@ import com.myshop.cache.CachePrefix;
 import com.myshop.common.security.AuthUser;
 import com.myshop.common.security.enums.PermissionEnum;
 import com.myshop.common.security.enums.UserEnums;
+import com.myshop.common.security.token.JwtTokenUtil;
 import com.myshop.common.security.token.Token;
-import com.myshop.common.security.token.TokenUtil;
 import com.myshop.common.security.token.base.TokenGeneratorBase;
 import com.myshop.modules.permission.entity.dos.AdminUser;
 import com.myshop.modules.permission.entity.vo.UserMenuVO;
@@ -25,10 +25,10 @@ import java.util.Map;
  * Lớp này kế thừa từ AbstractTokenGenerate và chịu trách nhiệm tạo token JWT cho người dùng quản lý.
  */
 @Component
-public class ManagerTokenGenerate extends TokenGeneratorBase<AdminUser> {
+public class ManagerTokenProvider extends TokenGeneratorBase<AdminUser> {
 
     @Autowired
-    private TokenUtil tokenUtil;
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     private MenuService menuService;
@@ -46,7 +46,7 @@ public class ManagerTokenGenerate extends TokenGeneratorBase<AdminUser> {
     @Override
     public Token createToken(AdminUser adminUser, Boolean longTerm) {
         // Xây dựng đối tượng AuthUser từ AdminUser
-        AuthUser authUser = AuthUser.builder().username(adminUser.getUsername()) // Tên đăng nhập
+        AuthUser user = AuthUser.builder().username(adminUser.getUsername()) // Tên đăng nhập
                 .id(adminUser.getId()) // ID người dùng
                 .face(adminUser.getAvatar()) // Ảnh đại diện
                 .role(UserEnums.MANAGER) // Vai trò (MANAGER)
@@ -55,12 +55,12 @@ public class ManagerTokenGenerate extends TokenGeneratorBase<AdminUser> {
                 .longTerm(longTerm) // Cờ token dài hạn
                 .build();
 
-        List<UserMenuVO> userMenuVOList = menuService.findAllMenu(authUser.getId()); // Lấy danh sách menu của người dùng
+        List<UserMenuVO> userMenuPermissions = menuService.findAllMenu(user.getId()); // Lấy danh sách menu của người dùng
 
         // Lưu danh sách quyền vào cache
-        cache.put(CachePrefix.PERMISSION_LIST.getPrefix(UserEnums.MANAGER) + authUser.getId(), this.permissionList(userMenuVOList));
+        cache.put(CachePrefix.PERMISSION_LIST.getPrefix(UserEnums.MANAGER) + user.getId(), this.permissionList(userMenuPermissions));
 
-        return tokenUtil.createToken(authUser); // Tạo token JWT
+        return jwtTokenUtil.createToken(user); // Tạo token JWT
     }
 
     /**
@@ -71,47 +71,47 @@ public class ManagerTokenGenerate extends TokenGeneratorBase<AdminUser> {
      */
     @Override
     public Token refreshToken(String refreshToken) {
-        return tokenUtil.refreshToken(refreshToken); // Gọi phương thức refreshToken của TokenUtil
+        return jwtTokenUtil.refreshToken(refreshToken); // Gọi phương thức refreshToken của TokenUtil
     }
 
     /**
      * Lấy danh sách quyền của người dùng.
      *
-     * @param userMenuVOList Danh sách menu của người dùng
+     * @param managerUserMenus Danh sách menu của người dùng
      * @return Map chứa danh sách quyền, với key là loại quyền (SUPER, QUERY) và value là danh sách URL được phép truy cập.
      */
-    public Map<String, List<String>> permissionList(List<UserMenuVO> userMenuVOList) {
+    public Map<String, List<String>> permissionList(List<UserMenuVO> managerUserMenus) {
         Map<String, List<String>> permission = new HashMap<>(2); // Khởi tạo map
 
-        List<String> superPermissions = new ArrayList<>(); // Danh sách quyền super admin
-        List<String> queryPermissions = new ArrayList<>(); // Danh sách quyền xem
-        initPermission(superPermissions, queryPermissions); // Khởi tạo quyền mặc định
+        List<String> superMenuPermissions = new ArrayList<>(); // Danh sách quyền super admin
+        List<String> queryMenuPermissions = new ArrayList<>(); // Danh sách quyền xem
+        initializePermissions(superMenuPermissions, queryMenuPermissions); // Khởi tạo quyền mặc định
 
         // Duyệt qua danh sách menu
-        if (userMenuVOList != null && !userMenuVOList.isEmpty()) {
-            userMenuVOList.forEach(menu -> {
+        if (managerUserMenus != null && !managerUserMenus.isEmpty()) {
+            managerUserMenus.forEach(menu -> {
                 // Kiểm tra quyền của menu
                 if (CharSequenceUtil.isNotEmpty(menu.getPermission())) {
                     String[] permissionUrl = menu.getPermission().split(","); // Tách chuỗi quyền thành mảng URL
 
                     for (String url : permissionUrl) { // Duyệt qua từng URL
                         if (Boolean.TRUE.equals(menu.getSuper())) { // Nếu là quyền super admin
-                            if (!superPermissions.contains(url)) { // Tránh trùng lặp
-                                superPermissions.add(url); // Thêm URL vào danh sách quyền super admin
+                            if (!superMenuPermissions.contains(url)) { // Tránh trùng lặp
+                                superMenuPermissions.add(url); // Thêm URL vào danh sách quyền super admin
                             }
                         } else { // Nếu là quyền xem
-                            if (!queryPermissions.contains(url)) { // Tránh trùng lặp
-                                queryPermissions.add(url); // Thêm URL vào danh sách quyền xem
+                            if (!queryMenuPermissions.contains(url)) { // Tránh trùng lặp
+                                queryMenuPermissions.add(url); // Thêm URL vào danh sách quyền xem
                             }
                         }
                     }
                 }
-                queryPermissions.removeAll(superPermissions); // Loại bỏ quyền xem bị trùng với quyền super admin
+                queryMenuPermissions.removeAll(superMenuPermissions); // Loại bỏ quyền xem bị trùng với quyền super admin
             });
         }
 
-        permission.put(PermissionEnum.SUPER.name(), superPermissions); // Lưu danh sách quyền super admin vào map
-        permission.put(PermissionEnum.QUERY.name(), queryPermissions); // Lưu danh sách quyền xem vào map
+        permission.put(PermissionEnum.SUPER.name(), superMenuPermissions); // Lưu danh sách quyền super admin vào map
+        permission.put(PermissionEnum.QUERY.name(), queryMenuPermissions); // Lưu danh sách quyền xem vào map
         return permission;
     }
 
@@ -120,10 +120,10 @@ public class ManagerTokenGenerate extends TokenGeneratorBase<AdminUser> {
      * Quyền xem bao gồm quyền xem thống kê lưu lượng truy cập trang chủ.
      * Quyền super admin bao gồm quyền quản lý thông tin cá nhân và thay đổi mật khẩu.
      *
-     * @param superPermissions Danh sách quyền super admin
-     * @param queryPermissions Danh sách quyền xem
+     * @param superMenuPermissions Danh sách quyền super admin
+     * @param queryMenuPermissions Danh sách quyền xem
      */
-    void initPermission(List<String> superPermissions, List<String> queryPermissions) {
+    void initializePermissions(List<String> superMenuPermissions, List<String> queryMenuPermissions) {
         //TODO Quản lý thông tin người dùng--Quyền thao tác
     }
 

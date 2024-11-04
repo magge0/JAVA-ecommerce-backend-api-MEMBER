@@ -11,7 +11,7 @@ import com.myshop.common.security.token.SecretKeyUtil;
 import com.myshop.common.utils.ResponseUtil;
 import com.myshop.modules.permission.service.MenuService;
 import com.myshop.common.security.enums.PermissionEnum;
-import com.myshop.modules.system.token.ManagerTokenGenerate;
+import com.myshop.modules.system.token.ManagerTokenProvider;
 import com.google.gson.Gson;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -45,13 +45,13 @@ public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
 
     public final MenuService menuService;
 
-    private final ManagerTokenGenerate managerTokenGenerate;
+    private final ManagerTokenProvider managerTokenProvider;
 
-    public ManagementAuthenticationFilter(AuthenticationManager authenticationManager, MenuService menuService, ManagerTokenGenerate managerTokenGenerate, Cache cache) {
+    public ManagementAuthenticationFilter(AuthenticationManager authenticationManager, MenuService menuService, ManagerTokenProvider managerTokenProvider, Cache cache) {
         super(authenticationManager);
         this.cache = cache;
         this.menuService = menuService;
-        this.managerTokenGenerate = managerTokenGenerate;
+        this.managerTokenProvider = managerTokenProvider;
     }
 
     @SneakyThrows
@@ -96,7 +96,7 @@ public class ManagementAuthenticationFilter extends BasicAuthenticationFilter {
             //Get permissions from cache
             Map<String, List<String>> permission = (Map<String, List<String>>) cache.get(permissionCacheKey);
             if (permission == null || permission.isEmpty()) {
-                permission = managerTokenGenerate.permissionList(this.menuService.findAllMenu(authUser.getId()));
+                permission = managerTokenProvider.permissionList(this.menuService.findAllMenu(authUser.getId()));
                 cache.put(permissionCacheKey, permission);
             }
             //Get data (GET request) permission

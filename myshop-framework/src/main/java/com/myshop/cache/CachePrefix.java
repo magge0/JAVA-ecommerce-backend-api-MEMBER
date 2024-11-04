@@ -6,6 +6,11 @@ import com.myshop.common.security.enums.UserEnums;
 public enum CachePrefix {
 
     /**
+     * Store user menu
+     */
+    STORE_MENU_USER,
+
+    /**
      * Permissions
      */
     PERMISSION_LIST,

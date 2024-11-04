@@ -18,12 +18,12 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
- * TokenUtil
+ * JwtTokenUtil
  *
  * @author vantrang
  */
 @Component
-public class TokenUtil {
+public class JwtTokenUtil {
 
     @Autowired
     private JWTTokenProperties tokenProperties;
@@ -34,20 +34,20 @@ public class TokenUtil {
     /**
      * Tạo token
      *
-     * @param authUser Khai báo riêng tư
+     * @param user Khai báo riêng tư
      * @return TOKEN
      */
-    public Token createToken(AuthUser authUser) {
+    public Token createToken(AuthUser user) {
         Token token = new Token();
 
-        String accessToken = createToken(authUser, tokenProperties.getTokenExpireTime());
+        String accessToken = createToken(user, tokenProperties.getTokenExpireTime());
 
-        cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(authUser.getRole(), authUser.getId()) + accessToken, 1, tokenProperties.getTokenExpireTime(), TimeUnit.MINUTES);
+        cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(user.getRole(), user.getId()) + accessToken, 1, tokenProperties.getTokenExpireTime(), TimeUnit.MINUTES);
         // Chiến lược tạo token làm mới: Nếu token có thời hạn dài (cho ứng dụng), thì token làm mới có thời hạn mặc định là 15 ngày. Nếu là đăng nhập người dùng thông thường, thì token làm mới có thời hạn gấp đôi token thông thường.
-        Long expireTime = authUser.getLongTerm() ? 15 * 24 * 60L : tokenProperties.getTokenExpireTime() * 2;
-        String refreshToken = createToken(authUser, expireTime);
+        Long expireTime = user.getLongTerm() ? 15 * 24 * 60L : tokenProperties.getTokenExpireTime() * 2;
+        String refreshToken = createToken(user, expireTime);
 
-        cache.put(CachePrefix.REFRESH_TOKEN.getPrefix(authUser.getRole(), authUser.getId()) + refreshToken, 1, expireTime, TimeUnit.MINUTES);
+        cache.put(CachePrefix.REFRESH_TOKEN.getPrefix(user.getRole(), user.getId()) + refreshToken, 1, expireTime, TimeUnit.MINUTES);
 
         token.setAccessToken(accessToken);
         token.setRefreshToken(refreshToken);
@@ -73,35 +73,35 @@ public class TokenUtil {
 
         // Lấy thông tin người dùng được lưu trữ trong claims
         String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
-        AuthUser authUser = new Gson().fromJson(json, AuthUser.class);
-        UserEnums userEnums = authUser.getRole();
+        AuthUser user = new Gson().fromJson(json, AuthUser.class);
+        UserEnums userEnums = user.getRole();
 
-        String username = authUser.getUsername();
+        String username = user.getUsername();
         // Lấy xem token có thời hạn dài hay không
-        boolean longTerm = authUser.getLongTerm();
+        boolean longTerm = user.getLongTerm();
 
 
         // Nếu có token làm mới trong cache và...
-        if (cache.hasKey(CachePrefix.REFRESH_TOKEN.getPrefix(userEnums, authUser.getId()) + oldRefreshToken)) {
+        if (cache.hasKey(CachePrefix.REFRESH_TOKEN.getPrefix(userEnums, user.getId()) + oldRefreshToken)) {
             Token token = new Token();
 
-            String accessToken = createToken(authUser, tokenProperties.getTokenExpireTime());
-            cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(userEnums, authUser.getId()) + accessToken, 1, tokenProperties.getTokenExpireTime(), TimeUnit.MINUTES);
+            String accessToken = createToken(user, tokenProperties.getTokenExpireTime());
+            cache.put(CachePrefix.ACCESS_TOKEN.getPrefix(userEnums, user.getId()) + accessToken, 1, tokenProperties.getTokenExpireTime(), TimeUnit.MINUTES);
 
             // Nếu là thiết bị tin cậy, thì gia hạn thời gian token làm mới
             Long expirationTime = tokenProperties.getTokenExpireTime() * 2;
             if (longTerm) {
                 expirationTime = 60 * 24 * 15L;
-                authUser.setLongTerm(true);
+                user.setLongTerm(true);
             }
 
             // Chiến lược tạo token làm mới: Nếu token có thời hạn dài (cho ứng dụng), thì token làm mới có thời hạn mặc định là 15 ngày. Nếu là đăng nhập người dùng thông thường, thì token làm mới có thời hạn gấp đôi token thông thường.
-            String refreshToken = createToken(authUser, expirationTime);
+            String refreshToken = createToken(user, expirationTime);
 
-            cache.put(CachePrefix.REFRESH_TOKEN.getPrefix(userEnums, authUser.getId()) + refreshToken, 1, expirationTime, TimeUnit.MINUTES);
+            cache.put(CachePrefix.REFRESH_TOKEN.getPrefix(userEnums, user.getId()) + refreshToken, 1, expirationTime, TimeUnit.MINUTES);
             token.setAccessToken(accessToken);
             token.setRefreshToken(refreshToken);
-            cache.remove(CachePrefix.REFRESH_TOKEN.getPrefix(userEnums, authUser.getId()) + oldRefreshToken);
+            cache.remove(CachePrefix.REFRESH_TOKEN.getPrefix(userEnums, user.getId()) + oldRefreshToken);
             return token;
         } else {
             throw new ServiceException(ResultCode.USER_SESSION_EXPIRED);
@@ -112,19 +112,19 @@ public class TokenUtil {
     /**
      * Tạo token
      *
-     * @param authUser       Đối tượng chính JWT
-     * @param expirationTime Thời gian hết hạn (phút)
+     * @param user      Đối tượng chính JWT
+     * @param expiresIn Thời gian hết hạn (phút)
      * @return Chuỗi token
      */
-    private String createToken(AuthUser authUser, Long expirationTime) {
+    private String createToken(AuthUser user, Long expiresIn) {
         // Tạo JWT
         return Jwts.builder()
                 // Khai báo riêng tư JWT
-                .claim(SecurityEnum.USER_CONTEXT.getValue(), new Gson().toJson(authUser))
+                .claim(SecurityEnum.USER_CONTEXT.getValue(), new Gson().toJson(user))
                 // Chủ thể JWT
-                .setSubject(authUser.getUsername())
+                .setSubject(user.getUsername())
                 // Thời gian hết hạn: hiện tại + thời gian hết hạn (phút)
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + expiresIn * 60 * 1000))
                 // Thuật toán ký và khóa
                 .signWith(SecretKeyUtil.generalKey()).compact();
     }

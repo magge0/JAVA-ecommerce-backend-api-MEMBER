@@ -8,7 +8,7 @@ import com.myshop.common.security.token.Token;
 import com.myshop.modules.permission.entity.dos.AdminUser;
 import com.myshop.modules.permission.mapper.AdminUserMapper;
 import com.myshop.modules.permission.service.AdminUserService;
-import com.myshop.modules.system.token.ManagerTokenGenerate;
+import com.myshop.modules.system.token.ManagerTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser> implements AdminUserService {
 
     @Autowired
-    private ManagerTokenGenerate managerTokenGenerate;
+    private ManagerTokenProvider managerTokenProvider;
 
     @Override
     public Token login(String username, String password) {
@@ -36,7 +36,7 @@ public class AdminUserServiceImpl extends ServiceImpl<AdminUserMapper, AdminUser
         }
         try {
             // Tạo token cho adminUser và trả về
-            return managerTokenGenerate.createToken(adminUser, false);
+            return managerTokenProvider.createToken(adminUser, false);
         } catch (Exception e) {
             log.error("Administrator login error", e);
         }
