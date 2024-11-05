@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myshop.cache.Cache;
 import com.myshop.cache.CachePrefix;
 import com.myshop.modules.product.entity.dos.ProductCategory;
+import com.myshop.modules.product.entity.dto.ProductCategorySearchParams;
 import com.myshop.modules.product.entity.vos.ProductCategoryVO;
 import com.myshop.modules.product.mapper.CategoryMapper;
 import com.myshop.modules.product.service.ProductCategoryService;
@@ -97,6 +98,48 @@ public class ProductCategoryServiceImpl extends ServiceImpl<CategoryMapper, Prod
             }
         }
         return productCategoryName;
+    }
+
+    @Override
+    public List<ProductCategory> getAllCategories(String parentId) {
+        return this.list(new LambdaQueryWrapper<ProductCategory>().eq(ProductCategory::getParentId, parentId));
+    }
+
+
+    @Override
+    public List<ProductCategoryVO> getAllChildren(ProductCategorySearchParams categorySearchParams) {
+
+        // Lấy tất cả các danh mục
+        List<ProductCategory> list = this.list(categorySearchParams.searchWrapper());
+
+        // Xây dựng cây danh mục
+        List<ProductCategoryVO> categoryTree = new ArrayList<>();
+        for (ProductCategory productCategory : list) {
+            if (("0").equals(productCategory.getParentId())) {
+                ProductCategoryVO categoryVO = new ProductCategoryVO(productCategory);
+                categoryVO.setChildCategories(findChildren(list, categoryVO));
+                categoryTree.add(categoryVO);
+            }
+        }
+        categoryTree.sort(Comparator.comparing(ProductCategory::getSortOrder));
+        return categoryTree;
+    }
+
+    @Override
+    public List<ProductCategoryVO> getAllChildren(String parentId) {
+        if ("0".equals(parentId)) {
+            return getCategoryTree();
+        }
+        // Lặp lại mã để tìm đối tượng và trả về danh sách con của nó
+        List<ProductCategoryVO> topCatList = getCategoryTree();
+        for (ProductCategoryVO item : topCatList) {
+            if (item.getId().equals(parentId)) {
+                return item.getChildCategories();
+            } else {
+                return getChildren(parentId, item.getChildCategories());
+            }
+        }
+        return new ArrayList<>();
     }
 
 
