@@ -54,4 +54,11 @@ public interface ProductService extends IService<Product> {
      * @return VO sản phẩm
      */
     ProductVO getProductVO(String productId);
+
+    /**
+     * Lấy sản phẩm dựa trên ID thương hiệu
+     *
+     * @param brandIds Danh sách ID thương hiệu
+     */
+    List<Product> getByBrandIds(List<String> brandIds);
 }

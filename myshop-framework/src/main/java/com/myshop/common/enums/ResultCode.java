@@ -91,6 +91,18 @@ public enum ResultCode {
     PRODUCT_STOCK_IMPORT_ERROR(11018, "Nhập kho sản phẩm thất bại, vui lòng kiểm tra dữ liệu trong bảng"),
 
     /**
+     * Thương hiệu
+     */
+    PRODUCT_BRAND_SAVE_ERROR(14001, "Thêm thương hiệu thất bại"),
+    PRODUCT_BRAND_UPDATE_ERROR(14002, "Cập nhật thương hiệu thất bại"),
+    PRODUCT_BRAND_DISABLE_ERROR(14003, "Vô hiệu hóa thương hiệu thất bại"),
+    PRODUCT_BRAND_DELETE_ERROR(14004, "Xóa thương hiệu thất bại"),
+    PRODUCT_BRAND_NAME_EXIST_ERROR(20002, "Tên thương hiệu đã tồn tại!"),
+    PRODUCT_BRAND_USE_DISABLE_ERROR(20003, "Danh mục đã được liên kết với thương hiệu, vui lòng hủy liên kết trước"),
+    PRODUCT_BRAND_BIND_ERROR(20005, "Thương hiệu đã được liên kết với sản phẩm, vui lòng hủy liên kết trước"),
+    PRODUCT_BRAND_NOT_EXIST(20004, "Thương hiệu không tồn tại"),
+
+    /**
      * Ngoại lệ hệ thống
      */
     RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau"),

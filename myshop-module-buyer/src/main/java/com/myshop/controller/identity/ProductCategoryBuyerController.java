@@ -3,8 +3,8 @@ package com.myshop.controller.identity;
 
 import com.myshop.common.enums.ResultUtil;
 import com.myshop.common.vo.ResultMessage;
-import com.myshop.modules.product.entity.vos.CategoryVO;
-import com.myshop.modules.product.service.CategoryService;
+import com.myshop.modules.product.entity.vos.ProductCategoryVO;
+import com.myshop.modules.product.service.ProductCategoryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -29,12 +29,12 @@ public class ProductCategoryBuyerController {
      * Phân loại hàng hóa
      */
     @Autowired
-    private CategoryService categoryService;
+    private ProductCategoryService productCategoryService;
 
     @ApiOperation(value = "Lấy danh sách phân loại hàng hóa")
     @ApiImplicitParam(name = "parentId", value = "ID phân loại cha, tất cả phân loại là: 0", required = true, dataType = "Long", paramType = "path")
     @GetMapping(value = "/{parentId}")
-    public ResultMessage<List<CategoryVO>> getAllCategories(@NotNull(message = "ID phân loại không được để trống") @PathVariable String parentId) {
-        return ResultUtil.data(categoryService.listSubCategories(parentId));
+    public ResultMessage<List<ProductCategoryVO>> getAllCategories(@NotNull(message = "ID phân loại không được để trống") @PathVariable String parentId) {
+        return ResultUtil.data(productCategoryService.listSubCategories(parentId));
     }
 }

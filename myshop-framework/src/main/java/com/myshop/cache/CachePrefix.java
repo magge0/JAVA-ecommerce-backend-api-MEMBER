@@ -8,7 +8,7 @@ public enum CachePrefix {
     /**
      * Cây phân cấp danh mục sản phẩm
      */
-    CATEGORY_DETAILS,
+    PRODUCT_CATEGORY,
 
     /**
      * Danh sách danh mục sản phẩm

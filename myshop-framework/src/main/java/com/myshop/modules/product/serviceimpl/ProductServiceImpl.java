@@ -13,8 +13,8 @@ import com.myshop.common.exception.ServiceException;
 import com.myshop.common.security.AuthUser;
 import com.myshop.common.security.context.UserContext;
 import com.myshop.common.security.enums.UserEnums;
-import com.myshop.modules.product.entity.dos.Category;
 import com.myshop.modules.product.entity.dos.Product;
+import com.myshop.modules.product.entity.dos.ProductCategory;
 import com.myshop.modules.product.entity.dos.ProductGallery;
 import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
@@ -24,7 +24,7 @@ import com.myshop.modules.product.entity.enums.ProductStatusEnum;
 import com.myshop.modules.product.entity.vos.ProductSkuVO;
 import com.myshop.modules.product.entity.vos.ProductVO;
 import com.myshop.modules.product.mapper.ProductMapper;
-import com.myshop.modules.product.service.CategoryService;
+import com.myshop.modules.product.service.ProductCategoryService;
 import com.myshop.modules.product.service.ProductGalleryService;
 import com.myshop.modules.product.service.ProductService;
 import com.myshop.modules.product.service.ProductSkuService;
@@ -52,7 +52,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     private ProductGalleryService productGalleryService;
 
     @Autowired
-    private CategoryService categoryService;
+    private ProductCategoryService productCategoryService;
 
     @Autowired
     private Cache<ProductVO> cache;
@@ -193,9 +193,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         List<String> categoryName = new ArrayList<>();
         String categoryPath = product.getCategoryPath();
         String[] strArray = categoryPath.split(",");
-        List<Category> categories = categoryService.listByIds(Arrays.asList(strArray));
-        for (Category category : categories) {
-            categoryName.add(category.getName());
+        List<ProductCategory> categories = productCategoryService.listByIds(Arrays.asList(strArray));
+        for (ProductCategory productCategory : categories) {
+            categoryName.add(productCategory.getName());
         }
         productVO.setCategoryName(categoryName);
 
@@ -209,6 +209,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
         cache.put(CachePrefix.PRODUCT.getPrefix() + productId, productVO);
         return productVO;
+    }
+
+    @Override
+    public List<Product> getByBrandIds(List<String> brandIds) {
+        LambdaQueryWrapper<Product> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(Product::getBrandId, brandIds);
+        return list(lambdaQueryWrapper);
     }
 
     /**
