@@ -110,6 +110,22 @@ public enum ResultCode {
     PRODUCT_SPEC_DELETE_ERROR(13003, "Phân loại đã liên kết với thông số kỹ thuật này, vui lòng hủy liên kết trước"),
 
     /**
+     * Danh mục
+     */
+    PRODUCT_CATEGORY_NOT_EXIST(10001, "Danh mục sản phẩm không tồn tại"),
+    PRODUCT_CATEGORY_NAME_IS_EXIST(10002, "Tên danh mục này đã tồn tại"),
+    PRODUCT_CATEGORY_PARENT_NOT_EXIST(10003, "Tên danh mục này đã tồn tại"),
+    PRODUCT_CATEGORY_BEYOND_THREE(10004, "Tối đa là 3 cấp danh mục, thêm thất bại"),
+    PRODUCT_CATEGORY_HAS_CHILDREN(10005, "Danh mục này có chứa danh mục con, không thể xóa"),
+    CATEGORY_HAS_PRODUCT(10006, "Danh mục này có chứa sản phẩm, không thể xóa"),
+    PRODUCT_CATEGORY_SAVE_ERROR(10007, "Danh mục này có chứa sản phẩm, không thể xóa"),
+    PRODUCT_CATEGORY_PARAMETER_NOT_EXIST(10012, "Nhóm tham số liên kết với danh mục không tồn tại"),
+    PRODUCT_CATEGORY_PARAMETER_SAVE_ERROR(10008, "Thêm nhóm tham số liên kết với danh mục thất bại"),
+    PRODUCT_CATEGORY_PARAMETER_UPDATE_ERROR(10009, "Thêm nhóm tham số liên kết với danh mục thất bại"),
+    PRODUCT_CATEGORY_DELETE_FLAG_ERROR(10010, "Trạng thái của danh mục con không thể khác với trạng thái của danh mục cha!"),
+    PRODUCT_CATEGORY_COMMISSION_RATE_ERROR(10011, "Tỷ lệ hoa hồng của danh mục không chính xác!"),
+
+    /**
      * Ngoại lệ hệ thống
      */
     RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau"),
