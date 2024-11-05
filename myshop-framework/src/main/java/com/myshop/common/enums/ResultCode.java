@@ -125,6 +125,13 @@ public enum ResultCode {
     PRODUCT_CATEGORY_DELETE_FLAG_ERROR(10010, "Trạng thái của danh mục con không thể khác với trạng thái của danh mục cha!"),
     PRODUCT_CATEGORY_COMMISSION_RATE_ERROR(10011, "Tỷ lệ hoa hồng của danh mục không chính xác!"),
 
+
+    /**
+     * Tham số
+     */
+    PRODUCT_PARAMETER_SAVE_ERROR(12001, "Thêm tham số thất bại"),
+    PRODUCT_PARAMETER_UPDATE_ERROR(12002, "Chỉnh sửa tham số thất bại"),
+
     /**
      * Ngoại lệ hệ thống
      */

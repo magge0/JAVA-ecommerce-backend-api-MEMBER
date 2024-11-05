@@ -219,6 +219,25 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     }
 
     /**
+     * Cập nhật thông tin tham số sản phẩm
+     *
+     * @param productId ID của sản phẩm
+     * @param params    Thông tin tham số sản phẩm
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProductParams(String productId, String params) {
+        // Tạo đối tượng LambdaUpdateWrapper để cập nhật thông tin sản phẩm
+        LambdaUpdateWrapper<Product> updateProductWrapper = new LambdaUpdateWrapper<>();
+        // Thiết lập điều kiện ID của sản phẩm cần cập nhật
+        updateProductWrapper.eq(Product::getId, productId);
+        // Thiết lập giá trị mới cho thông tin tham số sản phẩm
+        updateProductWrapper.set(Product::getParams, params);
+        // Thực hiện cập nhật thông tin sản phẩm
+        this.update(updateProductWrapper);
+    }
+
+    /**
      * Kiểm tra quyền quản trị viên của cửa hàng hiện tại đang đăng nhập
      *
      * @return Thông tin người dùng đang đăng nhập

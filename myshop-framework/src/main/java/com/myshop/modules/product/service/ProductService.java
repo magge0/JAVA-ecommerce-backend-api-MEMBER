@@ -61,4 +61,12 @@ public interface ProductService extends IService<Product> {
      * @param brandIds Danh sách ID thương hiệu
      */
     List<Product> getByBrandIds(List<String> brandIds);
+
+    /**
+     * Cập nhật thông tin tham số sản phẩm
+     *
+     * @param productId ID của sản phẩm
+     * @param params    Thông tin tham số sản phẩm
+     */
+    void updateProductParams(String productId, String params);
 }
