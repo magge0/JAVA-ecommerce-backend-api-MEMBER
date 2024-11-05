@@ -6,6 +6,17 @@ import com.myshop.common.security.enums.UserEnums;
 public enum CachePrefix {
 
     /**
+     * Cây phân cấp danh mục sản phẩm
+     */
+    CATEGORY_DETAILS,
+
+    /**
+     * Danh sách danh mục sản phẩm
+     */
+    CATEGORY_ARRAY,
+
+
+    /**
      * Store user menu
      */
     STORE_MENU_USER,
