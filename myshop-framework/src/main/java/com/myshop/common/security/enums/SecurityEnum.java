@@ -10,12 +10,12 @@ public enum SecurityEnum {
     /**
      * Tên tham số token trong header
      */
-    HEADER_TOKEN("accessToken"),
+    AUTHORIZATION_HEADER("accessToken"),
 
     /**
      * Tên trường lưu thông tin người dùng trong token JWT
      */
-    USER_CONTEXT("userContext"),
+    USER_CONTEXT_KEY("userContext"),
 
     /**
      * Khóa bí mật cho mã hóa và giải mã token JWT

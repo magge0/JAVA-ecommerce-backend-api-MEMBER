@@ -3,8 +3,9 @@ package com.myshop.security;
 import com.myshop.cache.Cache;
 import com.myshop.common.properties.IgnoredUrlsProperties;
 import com.myshop.common.security.InvalidAuthenticationEntryPoint;
-import com.myshop.modules.permission.service.MenuService;
-import com.myshop.modules.system.token.ManagerTokenGenerate;
+import com.myshop.modules.member.service.EmployeeService;
+import com.myshop.modules.member.service.StoreRoleMenuService;
+import com.myshop.modules.member.token.StoreTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,25 +24,20 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-/**
- * Spring Security Core Configuration Class Manager Security Configuration Center
- *
- * @author vantrang
- */
 @Slf4j
 @EnableWebSecurity(debug = true)
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @Configuration
-public class ManagementSecurityConfig {
+public class SecurityConfigForStore {
 
     @Autowired
     private IgnoredUrlsProperties ignoredUrlsProperties;
 
     @Autowired
-    private CorsConfigurationSource corsConfigurationSource;
+    private InvalidAuthenticationEntryPoint invalidAuthenticationEntryPoint;
 
     @Autowired
-    private InvalidAuthenticationEntryPoint invalidAuthenticationEntryPoint;
+    private CorsConfigurationSource corsConfigurationSource;
 
     /**
      * Authentication failure handling class Bean
@@ -55,15 +51,18 @@ public class ManagementSecurityConfig {
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
 
-    @Autowired
-    private MenuService menuService;
-
-    @Autowired
-    private ManagerTokenGenerate managerTokenGenerate;
 
     @Autowired
     private Cache<String> cache;
 
+    @Autowired
+    private StoreTokenProvider storeTokenProvider;
+
+    @Autowired
+    private StoreRoleMenuService storeRoleMenuService;
+
+    @Autowired
+    private EmployeeService employeeService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -74,22 +73,17 @@ public class ManagementSecurityConfig {
                         authorize.requestMatchers(url).permitAll();
                     }
                     authorize.anyRequest().authenticated();
-                })
+                }).logout(logout -> logout.permitAll())
                 //Enable cross-domain
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
-                //CSRF is disabled because Session is not used
-                .csrf(AbstractHttpConfigurer::disable)
-                //Based on token mechanism, so no Session is required
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource)).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 //A bunch of custom Spring Security handlers
-                .exceptionHandling(c -> c.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
-//                .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
-                .headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
+                .exceptionHandling(c -> c.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler)).headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         // Add custom JWT authentication filter
-        http.addFilterBefore(new ManagementAuthenticationFilter(authenticationManager, menuService, managerTokenGenerate, cache), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new AuthenticationFilterForStore(authenticationManager, storeTokenProvider, storeRoleMenuService, employeeService, cache), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
 }

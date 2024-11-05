@@ -36,6 +36,25 @@ public enum ResultCode {
     USER_PERMISSION_ERROR(20005, "Quyền hạn không đủ"),
     USER_PASSWORD_ERROR(20010, "Mật khẩu không chính xác"),
     USER_AUTH_ERROR(20005, "Quyền hạn không đủ"),
+    EMPLOYEE_NOT_FOUND(20027, "Nhân viên không tồn tại"),
+    EMPLOYEE_DISABLED(20031, "Nhân viên đã bị vô hiệu hóa"),
+    USER_NOT_FOUND(20002, "Người dùng không tồn tại hoặc tài khoản đã bị vô hiệu hóa"),
+
+
+    /**
+     * Cửa hàng
+     */
+
+    STORE_NOT_FOUND(50001, "Không tìm thấy cửa hàng"),
+    STORE_NAME_ALREADY_EXISTS(50002, "Tên cửa hàng đã tồn tại!"),
+    STORE_ALREADY_HAS_STORE(50003, "Bạn đã sở hữu cửa hàng!"),
+    STORE_NOT_OPENED(50004, "Thành viên này chưa mở cửa hàng"),
+    STORE_NOT_LOGGED_IN(50005, "Chưa đăng nhập vào cửa hàng"),
+    STORE_CLOSED(50006, "Cửa hàng đóng cửa, vui lòng liên hệ với quản trị viên"),
+    STORE_DELIVER_PRODUCT_ADDRESS(50007, "Vui lòng điền địa chỉ giao hàng của nhà cung cấp"),
+    FREIGHT_TEMPLATE_NOT_FOUND(50010, "Mẫu hiện tại không tồn tại"),
+    STORE_STATUS_IN_PROGRESS(50011, "Cửa hàng đang trong quá trình đăng ký hoặc phê duyệt, vui lòng không thực hiện thao tác lặp lại"),
+    STORE_SHIPPING_ADDRESS_REQUIRED(50012, "Vui lòng điền địa chỉ giao hàng"),
 
 
     /**
@@ -74,7 +93,8 @@ public enum ResultCode {
     /**
      * Ngoại lệ hệ thống
      */
-    RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau");
+    RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau"),
+    ;
 
 
     private final Integer code;
@@ -93,4 +113,4 @@ public enum ResultCode {
     public String message() {
         return this.message;
     }
-    }
+}

@@ -32,7 +32,7 @@ public class UserContext {
             // Lấy đối tượng HttpServletRequest từ thuộc tính request
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             // Lấy giá trị token từ header của request, sử dụng SecurityEnum để lấy tên header
-            String accessToken = request.getHeader(SecurityEnum.HEADER_TOKEN.getValue());
+            String accessToken = request.getHeader(SecurityEnum.AUTHORIZATION_HEADER.getValue());
             // Gọi hàm getAuthUser() để xác thực token và lấy thông tin người dùng
             return getAuthUser(accessToken);
         }
@@ -90,7 +90,7 @@ public class UserContext {
             // Lấy đối tượng HttpServletRequest từ thuộc tính request
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             // Lấy giá trị header có tên là SecurityEnum.HEADER_TOKEN.getValue() từ request và trả về
-            return request.getHeader(SecurityEnum.HEADER_TOKEN.getValue());
+            return request.getHeader(SecurityEnum.AUTHORIZATION_HEADER.getValue());
         }
         // Nếu không có thuộc tính request, trả về null
         return null;
@@ -107,7 +107,7 @@ public class UserContext {
             // Lấy thông tin từ token
             Claims claims = Jwts.parser().setSigningKey(SecretKeyUtil.generalKeyByDecoders()).parseClaimsJws(accessToken).getBody();
             // Lấy thông tin người dùng được lưu trữ trong claims
-            String json = claims.get(SecurityEnum.USER_CONTEXT.getValue()).toString();
+            String json = claims.get(SecurityEnum.USER_CONTEXT_KEY.getValue()).toString();
             // Chuyển đổi chuỗi JSON thành đối tượng AuthUser và trả về
             return new Gson().fromJson(json, AuthUser.class);
         } catch (Exception e) {
