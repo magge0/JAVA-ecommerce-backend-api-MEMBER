@@ -103,6 +103,13 @@ public enum ResultCode {
     PRODUCT_BRAND_NOT_EXIST(20004, "Thương hiệu không tồn tại"),
 
     /**
+     * Thông số kỹ thuật
+     */
+    PRODUCT_SPEC_SAVE_ERROR(13001, "Lưu thông số kỹ thuật thất bại"),
+    PRODUCT_SPEC_UPDATE_ERROR(13002, "Cập nhật thông số kỹ thuật thất bại"),
+    PRODUCT_SPEC_DELETE_ERROR(13003, "Phân loại đã liên kết với thông số kỹ thuật này, vui lòng hủy liên kết trước"),
+
+    /**
      * Ngoại lệ hệ thống
      */
     RATE_LIMIT_ERROR(1003, "Truy cập quá thường xuyên, vui lòng thử lại sau"),

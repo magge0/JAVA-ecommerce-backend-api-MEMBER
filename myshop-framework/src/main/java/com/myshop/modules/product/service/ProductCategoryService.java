@@ -30,4 +30,6 @@ public interface ProductCategoryService extends IService<ProductCategory> {
      * @return Danh sách tên danh mục
      */
     Object getProductCategoryNameByIds(List<String> categoryIds);
+
+
 }
