@@ -3,8 +3,10 @@ package com.myshop.modules.product.serviceimpl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myshop.cache.Cache;
 import com.myshop.cache.CachePrefix;
@@ -235,6 +237,14 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         updateProductWrapper.set(Product::getParams, params);
         // Thực hiện cập nhật thông tin sản phẩm
         this.update(updateProductWrapper);
+    }
+
+    @Override
+    public long getProductCountByCategory(String categoryId) {
+        QueryWrapper<Product> productQueryWrapper = Wrappers.query();
+        productQueryWrapper.like("category_path", categoryId);
+        productQueryWrapper.eq("delete_flag", false);
+        return this.count(productQueryWrapper);
     }
 
     /**

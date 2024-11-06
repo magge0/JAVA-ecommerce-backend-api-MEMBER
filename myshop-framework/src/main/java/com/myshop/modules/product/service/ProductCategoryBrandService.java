@@ -13,4 +13,11 @@ public interface ProductCategoryBrandService extends IService<ProductCategoryBra
      * @return Thông tin liên kết danh mục - thương hiệu
      */
     List<ProductCategoryBrand> getCategoryBrandsByBrandIds(List<String> brandIds);
+
+    /**
+     * Xóa các thương hiệu liên kết theo ID loại sản phẩm
+     *
+     * @param categoryId ID của loại sản phẩm
+     */
+    void deleteByProductCategoryId(String categoryId);
 }

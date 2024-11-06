@@ -14,4 +14,11 @@ public interface ProductCategorySpecificationService extends IService<ProductCat
      * @return Thông tin liên kết thông số kỹ thuật phân loại
      */
     List<ProductSpecification> getProductCategorySpecList(String categoryId);
+
+    /**
+     * Xóa các thông số kỹ thuật liên kết theo ID loại sản phẩm
+     *
+     * @param categoryId ID của loại sản phẩm
+     */
+    void deleteByProductCategoryId(String categoryId);
 }

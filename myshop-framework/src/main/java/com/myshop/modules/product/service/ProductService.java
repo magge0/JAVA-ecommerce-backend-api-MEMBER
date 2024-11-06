@@ -3,10 +3,12 @@ package com.myshop.modules.product.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.myshop.modules.product.entity.dos.Product;
+import com.myshop.modules.product.entity.dos.ProductCategory;
 import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
 import com.myshop.modules.product.entity.enums.ProductStatusEnum;
 import com.myshop.modules.product.entity.vos.ProductVO;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -69,4 +71,13 @@ public interface ProductService extends IService<Product> {
      * @param params    Thông tin tham số sản phẩm
      */
     void updateProductParams(String productId, String params);
+
+
+    /**
+     * Lấy số lượng sản phẩm thuộc một loại sản phẩm nhất định
+     *
+     * @param categoryId ID của loại sản phẩm
+     * @return Số lượng sản phẩm
+     */
+    long getProductCountByCategory(@NotNull String categoryId);
 }

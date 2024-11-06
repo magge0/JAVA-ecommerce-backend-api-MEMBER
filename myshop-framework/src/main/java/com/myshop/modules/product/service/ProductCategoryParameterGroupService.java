@@ -23,4 +23,11 @@ public interface ProductCategoryParameterGroupService extends IService<ProductCa
      * @return Danh sách nhóm tham số
      */
     List<ProductCategoryParameterGroup> getProductCategoryGroup(String categoryId);
+
+    /**
+     * Xóa các thương hiệu liên kết theo ID loại sản phẩm
+     *
+     * @param categoryId ID của loại sản phẩm
+     */
+    void deleteByProductCategoryId(String categoryId);
 }

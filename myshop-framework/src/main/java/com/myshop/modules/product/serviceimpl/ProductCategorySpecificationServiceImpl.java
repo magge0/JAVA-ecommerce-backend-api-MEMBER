@@ -1,5 +1,6 @@
 package com.myshop.modules.product.serviceimpl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myshop.modules.product.entity.dos.ProductCategorySpecification;
 import com.myshop.modules.product.entity.dos.ProductSpecification;
@@ -14,5 +15,10 @@ public class ProductCategorySpecificationServiceImpl extends ServiceImpl<Product
     @Override
     public List<ProductSpecification> getProductCategorySpecList(String categoryId) {
         return this.baseMapper.getProductCategorySpecList(categoryId);
+    }
+
+    @Override
+    public void deleteByProductCategoryId(String categoryId) {
+        this.baseMapper.delete(new LambdaQueryWrapper<ProductCategorySpecification>().eq(ProductCategorySpecification::getCategoryId, categoryId));
     }
 }

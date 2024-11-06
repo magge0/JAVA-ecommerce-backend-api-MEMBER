@@ -1,6 +1,7 @@
 package com.myshop.modules.product.serviceimpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myshop.modules.product.entity.dos.ProductCategoryParameterGroup;
 import com.myshop.modules.product.entity.dos.ProductParameters;
@@ -63,5 +64,10 @@ public class ProductCategoryParameterGroupServiceImpl extends ServiceImpl<Produc
     @Override
     public List<ProductCategoryParameterGroup> getProductCategoryGroup(String categoryId) {
         return this.list(new QueryWrapper<ProductCategoryParameterGroup>().eq("category_id", categoryId));
+    }
+
+    @Override
+    public void deleteByProductCategoryId(String categoryId) {
+        this.baseMapper.delete(new LambdaUpdateWrapper<ProductCategoryParameterGroup>().eq(ProductCategoryParameterGroup::getCategoryId, categoryId));
     }
 }
