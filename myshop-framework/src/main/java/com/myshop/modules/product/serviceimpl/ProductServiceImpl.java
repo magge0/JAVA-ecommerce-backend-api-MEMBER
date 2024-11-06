@@ -3,8 +3,10 @@ package com.myshop.modules.product.serviceimpl;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.myshop.cache.Cache;
 import com.myshop.cache.CachePrefix;
@@ -13,8 +15,8 @@ import com.myshop.common.exception.ServiceException;
 import com.myshop.common.security.AuthUser;
 import com.myshop.common.security.context.UserContext;
 import com.myshop.common.security.enums.UserEnums;
-import com.myshop.modules.product.entity.dos.Category;
 import com.myshop.modules.product.entity.dos.Product;
+import com.myshop.modules.product.entity.dos.ProductCategory;
 import com.myshop.modules.product.entity.dos.ProductGallery;
 import com.myshop.modules.product.entity.dos.ProductSearchParams;
 import com.myshop.modules.product.entity.dto.ProductOperationDTO;
@@ -24,7 +26,7 @@ import com.myshop.modules.product.entity.enums.ProductStatusEnum;
 import com.myshop.modules.product.entity.vos.ProductSkuVO;
 import com.myshop.modules.product.entity.vos.ProductVO;
 import com.myshop.modules.product.mapper.ProductMapper;
-import com.myshop.modules.product.service.CategoryService;
+import com.myshop.modules.product.service.ProductCategoryService;
 import com.myshop.modules.product.service.ProductGalleryService;
 import com.myshop.modules.product.service.ProductService;
 import com.myshop.modules.product.service.ProductSkuService;
@@ -52,7 +54,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     private ProductGalleryService productGalleryService;
 
     @Autowired
-    private CategoryService categoryService;
+    private ProductCategoryService productCategoryService;
 
     @Autowired
     private Cache<ProductVO> cache;
@@ -193,9 +195,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         List<String> categoryName = new ArrayList<>();
         String categoryPath = product.getCategoryPath();
         String[] strArray = categoryPath.split(",");
-        List<Category> categories = categoryService.listByIds(Arrays.asList(strArray));
-        for (Category category : categories) {
-            categoryName.add(category.getName());
+        List<ProductCategory> categories = productCategoryService.listByIds(Arrays.asList(strArray));
+        for (ProductCategory productCategory : categories) {
+            categoryName.add(productCategory.getName());
         }
         productVO.setCategoryName(categoryName);
 
@@ -209,6 +211,40 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
 
         cache.put(CachePrefix.PRODUCT.getPrefix() + productId, productVO);
         return productVO;
+    }
+
+    @Override
+    public List<Product> getByBrandIds(List<String> brandIds) {
+        LambdaQueryWrapper<Product> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(Product::getBrandId, brandIds);
+        return list(lambdaQueryWrapper);
+    }
+
+    /**
+     * Cập nhật thông tin tham số sản phẩm
+     *
+     * @param productId ID của sản phẩm
+     * @param params    Thông tin tham số sản phẩm
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProductParams(String productId, String params) {
+        // Tạo đối tượng LambdaUpdateWrapper để cập nhật thông tin sản phẩm
+        LambdaUpdateWrapper<Product> updateProductWrapper = new LambdaUpdateWrapper<>();
+        // Thiết lập điều kiện ID của sản phẩm cần cập nhật
+        updateProductWrapper.eq(Product::getId, productId);
+        // Thiết lập giá trị mới cho thông tin tham số sản phẩm
+        updateProductWrapper.set(Product::getParams, params);
+        // Thực hiện cập nhật thông tin sản phẩm
+        this.update(updateProductWrapper);
+    }
+
+    @Override
+    public long getProductCountByCategory(String categoryId) {
+        QueryWrapper<Product> productQueryWrapper = Wrappers.query();
+        productQueryWrapper.like("category_path", categoryId);
+        productQueryWrapper.eq("delete_flag", false);
+        return this.count(productQueryWrapper);
     }
 
     /**

@@ -1,6 +1,6 @@
 package com.myshop.modules.product.entity.dto;
 
-import com.myshop.modules.product.entity.dos.Category;
+import com.myshop.modules.product.entity.dos.ProductCategory;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +23,7 @@ public class ProductImportDTO {
     private String productHighlight;
 
     @ApiModelProperty(value = "Phân loại sản phẩm")
-    private Category category;
+    private ProductCategory productCategory;
 
     @ApiModelProperty(value = "Mẫu vận chuyển")
     private String shippingTemplate;

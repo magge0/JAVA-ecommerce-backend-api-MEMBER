@@ -18,7 +18,7 @@ import java.util.Date;
 @ApiModel(value = "Danh mục sản phẩm")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Category extends BaseEntity {
+public class ProductCategory extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,7 +51,7 @@ public class Category extends BaseEntity {
     @ApiModelProperty(value = "Hỗ trợ kênh")
     private Boolean isChannelSupported;
 
-    public Category(String id, String createBy, Date createTime, String updateBy, Date updateTime, Boolean deleteFlag, String name, String parentId, Integer level, BigDecimal sortOrder, Double commissionRate, String image, Boolean supportChannel) {
+    public ProductCategory(String id, String createBy, Date createTime, String updateBy, Date updateTime, Boolean deleteFlag, String name, String parentId, Integer level, BigDecimal sortOrder, Double commissionRate, String image, Boolean supportChannel) {
         super(id, createBy, createTime, updateBy, updateTime, deleteFlag);
         this.name = name;
         this.parentId = parentId;
@@ -62,7 +62,7 @@ public class Category extends BaseEntity {
         this.isChannelSupported = supportChannel;
     }
 
-    public Category(String id, String name, String parentId, Integer level, BigDecimal sortOrder, Double commissionRate, String image, Boolean supportChannel) {
+    public ProductCategory(String id, String name, String parentId, Integer level, BigDecimal sortOrder, Double commissionRate, String image, Boolean supportChannel) {
         this.name = name;
         this.parentId = parentId;
         this.level = level;
